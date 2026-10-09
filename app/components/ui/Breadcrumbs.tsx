@@ -13,6 +13,7 @@ const routeMap: Record<string, string> = {
     new: "Nuevo",
     contact: "Contactos",
     skill: "Habilidades",
+    configuration: "Configuración",
 }
 
 const isUUID = (str: string) => /^[0-9a-fA-F-]{36}$/.test(str)
@@ -31,7 +32,7 @@ function resolveLabel(segment: string) {
     return segment.charAt(0).toUpperCase() + segment.slice(1)
 }
 
-export function Breadcrumbs() {
+export function Breadcrumbs({ hasProfile }: { hasProfile: boolean }) {
     const pathname = usePathname() ?? ""
     const [open, setOpen] = useState(false)
     const dropdownRef = useRef<HTMLDivElement>(null)
@@ -40,7 +41,9 @@ export function Breadcrumbs() {
 
     const paths = segments.map((segment, index) => {
         const href = "/" + segments.slice(0, index + 1).join("/")
-        const label = resolveLabel(segment)
+        const label = pathname === "/dashboard/profile/edit" && segment === "edit" && !hasProfile
+            ? "Crear"
+            : resolveLabel(segment)
         return { href, label }
     })
 

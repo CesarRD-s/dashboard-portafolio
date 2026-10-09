@@ -10,16 +10,16 @@ export const createContact = safeAction(async (formData: FormData) => {
     const dto = parseWithSchema(contactFormDataSchema, formDataToObject(formData));
     await ContactService.create(dto);
 
-    revalidatePath("/dashboard/contact");
+    revalidatePath("/dashboard", "layout");
 });
 
 export const deleteContact = safeAction(async (id: string) => {
     await ContactService.delete(id);
-    revalidatePath("/dashboard/contact");
+    revalidatePath("/dashboard", "layout");
 });
 
 export const updateContact = safeAction(async (id: string, formData: FormData) => {
     const dto = parseWithSchema(contactFormDataSchema, formDataToObject(formData));
     await ContactService.update(id, dto);
-    revalidatePath("/dashboard/contact");
+    revalidatePath("/dashboard", "layout");
 });

@@ -25,5 +25,17 @@ export const projectUpdateSchema = z.object({
     img: projectImageSchema.optional(),
 });
 
+export const projectCreateServerSchema = z.object({
+    ...projectFields,
+    imgPath: z.string().min(1, 'La imagen es obligatoria'),
+});
+
+export const projectUpdateServerSchema = z.object({
+    ...projectFields,
+    imgPath: z.string().optional(),
+});
+
 export type ProjectCreateForm = z.infer<typeof projectCreateSchema>;
 export type ProjectUpdateForm = z.infer<typeof projectUpdateSchema>;
+export type ProjectCreateInput = z.infer<typeof projectCreateServerSchema>;
+export type ProjectUpdateInput = z.infer<typeof projectUpdateServerSchema>;

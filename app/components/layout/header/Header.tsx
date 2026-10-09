@@ -2,7 +2,6 @@
 
 import { Profile } from "@/app/modules/profile/profile.model";
 import { Avatar } from "./Avatar";
-import { useRouter } from "next/navigation";
 import { LogOut, Menu } from "lucide-react";
 import { useSidebar } from "@/app/components/sidebar/sidebar.provider";
 import { Breadcrumbs } from "../../ui/Breadcrumbs";
@@ -11,18 +10,17 @@ import { AppError } from "@/app/lib/errors/AppError";
 import { useToast } from "@/app/components/toast/toast.provider";
 
 type Props = {
-    profile: Profile;
+    profile: Profile | null;
 };
 
 export function Header({ profile }: Props) {
-    const router = useRouter();
     const { toggleOpen, isDesktop } = useSidebar();
     const { showToast } = useToast();
 
     const handlerLogOut = async () => {
         try {
             await AuthService.logout();
-            router.replace("/");
+            window.location.replace("/");
         } catch (error) {
             showToast({
                 title: "No se pudo cerrar sesión",
@@ -49,7 +47,7 @@ export function Header({ profile }: Props) {
                         </button>
                     )}
 
-                    <Breadcrumbs />
+                    <Breadcrumbs hasProfile={Boolean(profile)} />
                 </div>
 
                 {/* RIGHT */}

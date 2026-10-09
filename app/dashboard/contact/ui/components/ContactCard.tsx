@@ -1,14 +1,14 @@
 import { Contact } from "@/app/modules/contacts/contact.model"
 import { formatDate } from "date-fns/format";
-import { Edit, Trash } from "lucide-react";
+import { Edit } from "lucide-react";
 import Link from "next/link";
+import { DeleteContactButton } from "./DeleteContactButton";
 
 type Props = {
     contact: Contact
-    onDelete?: (contact: Contact) => void
 }
 
-export function ContactCard({ contact, onDelete }: Props) {
+export function ContactCard({ contact }: Props) {
     return (
         <div className="p-5 rounded-md border border-neutral-300 dark:border-neutral-700 
         bg-white dark:bg-neutral-900/30 flex flex-col justify-between gap-4"
@@ -70,13 +70,7 @@ export function ContactCard({ contact, onDelete }: Props) {
                         Editar
                     </Link>
 
-                    <button
-                        onClick={() => onDelete?.(contact)}
-                        className="text-sm font-medium text-red-500/80 hover:underline cursor-pointer"
-                    >
-                        <Trash size={14} className="inline-block mr-1" />
-                        Eliminar
-                    </button>
+                    <DeleteContactButton id={contact.id} value={contact.value} />
                 </div>
             </div>
         </div>

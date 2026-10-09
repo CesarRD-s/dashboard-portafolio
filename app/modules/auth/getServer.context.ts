@@ -1,22 +1,29 @@
-import { AppError } from "@/app/lib/errors/AppError";
+import 'server-only';
+
 import { mapSupabaseError } from "@/app/lib/errors/ErrorMapper";
 import { getSupabaseServerReadonly } from "@/app/lib/supabase/server";
 import { SupabaseClient } from "@supabase/supabase-js";
+import { cache } from "react";
+import { redirect } from "next/navigation";
 
-export async function getServerAuthContext(): Promise<{ userId: string, supabase: SupabaseClient }> {
+export const getCurrentUser = cache(async () => {
     const supabase = await getSupabaseServerReadonly();
-    const { data, error } = await supabase.auth.getClaims();
+    const { data, error } = await supabase.auth.getUser();
 
-    if (error) {
+    if (error && error.name !== 'AuthSessionMissingError') {
         throw mapSupabaseError(error);
     }
 
-    if (!data?.claims.sub) {
-        throw new AppError('warning', 'Usuario no encontrado');
-    }
+    return { user: data.user, supabase };
+});
+
+export async function getServerAuthContext(): Promise<{ userId: string, supabase: SupabaseClient }> {
+    const { user, supabase } = await getCurrentUser();
+
+    if (!user) redirect('/');
 
     return {
-        userId: data.claims.sub,
+        userId: user.id,
         supabase
     }
 }

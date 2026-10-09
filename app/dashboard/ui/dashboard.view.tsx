@@ -1,13 +1,10 @@
-"use client";
-
-import { ArrowUp, Clock3, FolderKanban } from "lucide-react";
+import { ArrowUp, Clock3 } from "lucide-react";
 import { Section } from "@/app/components/layout/Section";
 import { OverviewData } from "@/app/modules/profile/profile.model";
 import { StatCard } from "./components/StatCard";
 import { RecentActivity } from "./components/RecentActivity";
 import { actions } from "./components/config";
 import { ActionCard } from "./components/ActionCard";
-import { ButtonLink } from "@/app/components/shared/ButtonLink";
 import { Fragment } from "react/jsx-runtime";
 
 type Props = {
@@ -24,16 +21,6 @@ export function DashboardView({ data }: Props) {
             description="Resumen general de tu portafolio"
         >
             <div className="space-y-6">
-
-                <div className="flex justify-end">
-                    <ButtonLink
-                        href="https://www.cesardd.com/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        icon={FolderKanban}
-                        label="Ver portafolio"
-                    />
-                </div>
 
                 {/* Stats */}
                 <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
@@ -63,7 +50,7 @@ export function DashboardView({ data }: Props) {
 
                     <div className="space-y-5">
                         {recentActivity.map((activity, index) => (
-                            <Fragment key={index}>
+                            <Fragment key={`${activity.type}-${activity.id}`}>
                                 <RecentActivity
                                     type={activity.type}
                                     title={activity.title}
@@ -73,6 +60,7 @@ export function DashboardView({ data }: Props) {
                                 {index !== recentActivity.length - 1 && <div className="border-b border-neutral-300 dark:border-neutral-700" />}
                             </Fragment>
                         ))}
+                        {recentActivity.length === 0 && <p className="text-sm text-neutral-500">Todavía no hay actividad.</p>}
                     </div>
                 </div>
 

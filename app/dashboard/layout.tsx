@@ -2,11 +2,10 @@ import { ReactNode } from "react";
 import { redirect } from "next/navigation";
 import { DashboardShell } from "./ui/dashboard.layout";
 import { ProfileService } from "../modules/profile/profile.service";
-import { getSupabaseServerReadonly } from "../lib/supabase/server";
+import { getCurrentUser } from "../modules/auth/getServer.context";
 
 export default async function DashboardLayout({ children }: { children: ReactNode }) {
-    const supabase = await getSupabaseServerReadonly();
-    const { data: { user } } = await supabase.auth.getUser();
+    const { user } = await getCurrentUser();
 
     if (!user) { redirect("/") }
     const profile = await ProfileService.getOne();

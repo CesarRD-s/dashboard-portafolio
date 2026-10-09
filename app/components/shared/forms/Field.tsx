@@ -10,7 +10,7 @@ export const Field = ({ label, htmlFor = "", children, hint, error }: FieldProps
     return (
         <div className="flex flex-col gap-2">
             <label
-                className="text-sm text-neutral-500 dark:text-neutral-400"
+                className="text-sm font-medium text-neutral-800 dark:text-neutral-200"
                 htmlFor={htmlFor}
             >
                 {label}
@@ -19,7 +19,7 @@ export const Field = ({ label, htmlFor = "", children, hint, error }: FieldProps
             {children}
 
             {hint && (
-                <span className="text-xs text-neutral-400">
+                <span className="text-xs text-neutral-500 dark:text-neutral-400">
                     {hint}
                 </span>
             )}

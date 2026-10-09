@@ -1,7 +1,7 @@
 'use client'
 
 import { AppModules } from "@/app/lib/app_modules/appModules"
-import { usePathname, useRouter } from "next/navigation"
+import { usePathname } from "next/navigation"
 import { useSidebar } from "./sidebar.provider"
 import { PanelLeft } from "lucide-react"
 import { SidebarItem } from "./SidebarItem"
@@ -9,14 +9,8 @@ import clsx from "clsx"
 
 export function Sidebar() {
     const pathname = usePathname() ?? ""
-    const router = useRouter()
 
     const { isOpen, isCollapsed, isDesktop, toggleCollapse, close } = useSidebar()
-
-    const navigate = (href: string) => {
-        router.push(href)
-        if (!isDesktop) close()
-    }
 
     return (
         <>
@@ -62,9 +56,10 @@ export function Sidebar() {
                             key={module.id}
                             icon={module.icon}
                             label={module.label}
-                            active={pathname.endsWith(module.basePath)}
+                            active={pathname === module.basePath || (module.basePath !== '/dashboard' && pathname.startsWith(`${module.basePath}/`))}
                             collapsed={isCollapsed}
-                            onClick={() => navigate(module.basePath)}
+                            href={module.basePath}
+                            onClick={() => { if (!isDesktop) close() }}
                         />
                     ))}
                 </div>

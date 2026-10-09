@@ -1,7 +1,9 @@
-import { StatusMessage } from "@/app/components/ui/StatusMessage";
+import { SkillsService } from '@/app/modules/skills/skills.service';
+import { SkillView } from './ui/skill.view';
 
-export default function ConfigurationPage() {
-    return (
-        <StatusMessage variant="info" title="Habilidades" message="Página en desarrollo. Vuelve pronto"/>
-    );
+export const metadata = { title: 'Habilidades | Dashboard' };
+
+export default async function SkillPage() {
+    const skills = await SkillsService.getAll();
+    return <SkillView skills={skills} />;
 }

@@ -1,14 +1,13 @@
 import { redirect } from "next/navigation";
 import { LoginView } from "./ui/login.view";
-import { getSupabaseServerReadonly } from "../lib/supabase/server";
+import { getCurrentUser } from "../modules/auth/getServer.context";
 
 export const metadata = {
-    title: 'Autenticación'
+    title: 'Iniciar sesión'
 }
 
 export default async function LoginPage() {
-    const supabase = await getSupabaseServerReadonly();
-    const { data: { user } } = await supabase.auth.getUser();
+    const { user } = await getCurrentUser();
     if (user) {
         redirect('/dashboard')
     }

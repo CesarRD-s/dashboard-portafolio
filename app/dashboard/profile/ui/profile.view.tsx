@@ -1,18 +1,27 @@
-'use client'
-
 import { Section } from "@/app/components/layout/Section";
 import { ButtonLink } from "@/app/components/shared/ButtonLink";
 import { Profile } from "@/app/modules/profile/profile.model";
 import { formatDate } from "date-fns";
-import { Edit } from "lucide-react";
+import { Edit, UserRound } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
 type Props = {
-    profile: Profile
+    profile: Profile | null
 }
 
 export function ProfileView({ profile }: Props) {
+    if (!profile) {
+        return (
+            <Section id="profile" title="Perfil" description="Información pública mostrada en tu portafolio">
+                <div className="rounded-md border border-neutral-300 dark:border-neutral-700 p-6 bg-white dark:bg-neutral-900/30 space-y-4">
+                    <p className="text-neutral-600 dark:text-neutral-400">Todavía no has completado tu perfil.</p>
+                    <ButtonLink href="/dashboard/profile/edit" icon={Edit} label="Crear perfil" />
+                </div>
+            </Section>
+        );
+    }
+
     return (
         <Section
             id="profile"
@@ -34,13 +43,19 @@ export function ProfileView({ profile }: Props) {
                 <div className='flex flex-col md:flex-row items-center gap-6'>
                     {/* AVATAR */}
                     <div>
-                        <Image
-                            src={profile.avatarUrl}
-                            alt="Avatar"
-                            width={140}
-                            height={140}
-                            className="rounded-md border border-neutral-300 dark:border-neutral-700 object-cover shrink-0"
-                        />
+                        {profile.avatarUrl ? (
+                            <Image
+                                src={profile.avatarUrl}
+                                alt="Avatar"
+                                width={140}
+                                height={140}
+                                className="rounded-md border border-neutral-300 dark:border-neutral-700 object-cover shrink-0"
+                            />
+                        ) : (
+                            <div className="flex h-[140px] w-[140px] items-center justify-center rounded-md border border-neutral-300 dark:border-neutral-700">
+                                <UserRound aria-label="Sin avatar" size={48} className="text-neutral-500" />
+                            </div>
+                        )}
                     </div>
 
                     <div className='flex flex-col gap-4 md:gap-1'>
@@ -80,13 +95,15 @@ export function ProfileView({ profile }: Props) {
                         flex items-center justify-between flex-wrap gap-3
                         pt-4 border-t border-neutral-200 dark:border-neutral-800
                     ">
-                    <Link
-                        href={profile.cvUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 text-sm font-medium text-blue-600 hover:underline">
-                        Descargar CV
-                    </Link>
+                    {profile.cvUrl && (
+                        <Link
+                            href={profile.cvUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 text-sm font-medium text-blue-600 hover:underline">
+                            Descargar CV
+                        </Link>
+                    )}
 
                     <span className="text-sm text-neutral-500 whitespace-nowrap">
                         {formatDate(new Date(profile.updatedAt), "dd MMM yyyy")}

@@ -1,11 +1,13 @@
 import clsx from "clsx"
 import { LucideIcon } from "lucide-react"
+import Link from "next/link"
 
 type Props = {
     icon: LucideIcon
     label: string
     active?: boolean
     collapsed: boolean
+    href: string
     onClick: () => void
 }
 
@@ -14,11 +16,15 @@ export function SidebarItem({
     label,
     active,
     collapsed,
+    href,
     onClick
 }: Props) {
     return (
-        <button
+        <Link
+            href={href}
             onClick={onClick}
+            aria-current={active ? 'page' : undefined}
+            aria-label={collapsed ? label : undefined}
             className={clsx(
                 "flex items-center gap-3 w-full rounded-md px-3 py-2.5 text-sm transition-all cursor-pointer",
                 active
@@ -34,6 +40,6 @@ export function SidebarItem({
             <span className="whitespace-nowrap transition-all duration">
                 {collapsed ? "" : label}
             </span>
-        </button>
+        </Link>
     )
 }

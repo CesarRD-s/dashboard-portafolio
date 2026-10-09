@@ -2,17 +2,16 @@
 
 import { Section } from "@/app/components/layout/Section";
 import { ButtonSubmit } from "@/app/components/shared/forms/ButtonSubmit";
-import { Field } from "@/app/components/shared/forms/Field";
-import { Input } from "@/app/components/shared/forms/Input";
-import { Select } from "@/app/components/shared/forms/Select";
 import { useToast } from "@/app/components/toast/toast.provider";
 import { toFormData } from "@/app/lib/forms/zod";
 import { updateContact } from "@/app/modules/contacts/actions/contact.action";
 import { contactSchema, ContactForm } from "@/app/modules/contacts/contact.schema";
-import { categoryContact, Contact, typeContact } from "@/app/modules/contacts/contact.model";
+import { Contact } from "@/app/modules/contacts/contact.model";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Save } from "lucide-react";
 import { useForm } from "react-hook-form";
+import Link from "next/link";
+import { ContactFields } from "@/app/dashboard/contact/ui/components/ContactFields";
 
 type Props = {
     contact: Contact
@@ -20,7 +19,7 @@ type Props = {
 
 export function ContactEditView({ contact }: Props) {
     const { showToast } = useToast();
-    const { register, handleSubmit, formState: { errors, isDirty, isSubmitting } } = useForm<ContactForm>({
+    const { register, handleSubmit, reset, formState: { errors, isDirty, isValid, isSubmitting } } = useForm<ContactForm>({
         resolver: zodResolver(contactSchema),
         defaultValues: {
             title: contact.title,
@@ -48,6 +47,7 @@ export function ContactEditView({ contact }: Props) {
                 message: "Contacto actualizado correctamente",
                 type: "success",
             });
+            reset(values);
     };
 
     return (
@@ -55,92 +55,17 @@ export function ContactEditView({ contact }: Props) {
             id="contact-edit"
             title="Editar Contacto"
             description="Actualiza información de tu contacto"
+            className="mx-auto max-w-4xl"
         >
 
-            {/* FORM */}
             <form
                 onSubmit={handleSubmit(onSubmit)}
-                className="p-6 rounded-md border border-neutral-300 dark:border-neutral-700 
-                        bg-white dark:bg-neutral-900/30 flex flex-col gap-8"
             >
+                <ContactFields register={register} errors={errors} />
 
-                {/* GRID */}
-                <div className="grid gap-6 md:grid-cols-2">
-
-                    <Field label="Título" htmlFor="title" error={errors.title?.message}>
-                        <Input
-                            id="title"
-                            {...register("title")}
-                            error={!!errors.title}
-                            placeholder="Nombre del proyecto"
-                        />
-                    </Field>
-
-                    <Field label="Valor" htmlFor="value" error={errors.value?.message}>
-                        <Input
-                            id="value"
-                            {...register("value")}
-                            error={!!errors.value}
-                            placeholder="Ej: email@ejemplo.com, +504-3456-7890, https://linkedin.com/in/nombre, https://github.com/nombre..."
-                        />
-                    </Field>
-
-                </div>
-
-                {/* CATEGORY */}
-                <Field label="Categoría" htmlFor="category" error={errors.category?.message}>
-                    <Select
-                        id="category"
-                        {...register("category")}
-                        error={!!errors.category}
-                    >
-                        {categoryContact.map(({ value, text }) => (
-                            <option key={value} value={value}>
-                                {text}
-                            </option>
-                        ))}
-                    </Select>
-                </Field>
-
-                {/* TYPE */}
-                <Field label="Tipo de Contacto" htmlFor="type" error={errors.type?.message}>
-                    <Select
-                        id="type"
-                        {...register("type")}
-                        error={!!errors.type}
-                    >
-                        {typeContact.map(({ value, text }) => (
-                            <option key={value} value={value}>
-                                {text}
-                            </option>
-                        ))}
-                    </Select>
-                </Field>
-
-                {/* LINK */}
-                <Field label="Enlace" htmlFor="linkUrl" error={errors.linkUrl?.message}>
-                    <Input
-                        id="linkUrl"
-                        {...register("linkUrl")}
-                        error={!!errors.linkUrl}
-                        placeholder="https://..."
-                    />
-                </Field>
-
-                {/* IS PRIMARY */}
-                <Field label="Es contacto principal?" htmlFor="isPrimary" error={errors.isPrimary?.message}>
-                    <Select
-                        id="isPrimary"
-                        {...register("isPrimary", { setValueAs: (value) => value === "true" })}
-                    >
-                        <option value="true">Si</option>
-                        <option value="false">No</option>
-                    </Select>
-                </Field>
-
-                {/* ACTIONS */}
-                <div className="flex justify-start">
-                    <ButtonSubmit isValid={isDirty} loading={isSubmitting} text="Guardar cambios" icon={<Save size={16} />} />
+                <div className="flex flex-col-reverse gap-3 border-t border-neutral-300 pt-6 dark:border-neutral-700 sm:flex-row sm:items-center sm:justify-end">
+                    <Link href="/dashboard/contact" className="inline-flex min-h-10 items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-neutral-600 transition hover:bg-neutral-100 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-white">Cancelar</Link>
+                    <ButtonSubmit isValid={isDirty && isValid} loading={isSubmitting} text="Guardar cambios" icon={<Save size={16} />} className="min-h-10 w-full sm:w-auto" />
                 </div>
 
             </form>
