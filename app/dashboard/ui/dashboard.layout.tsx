@@ -10,7 +10,7 @@ import clsx from "clsx"
 
 type Props = {
     children: ReactNode
-    profile: Profile
+    profile: Profile | null
 }
 
 function DashboardLayoutContent({ children, profile }: Props) {

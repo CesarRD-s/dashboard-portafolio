@@ -15,10 +15,10 @@ export function ButtonSubmit(
     return (
         <button
             type="submit"
-            disabled={!isValid}
-            className={`mt-2 inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm font-medium 
+            disabled={!isValid || loading}
+            className={`inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm font-medium
                 transition duration ${className}
-                ${isValid
+                ${isValid && !loading
                     ? 'bg-blue-600 text-white hover:bg-blue-500 cursor-pointer'
                     : 'bg-neutral-200 dark:bg-neutral-700 text-neutral-400 cursor-not-allowed'}`}
         >

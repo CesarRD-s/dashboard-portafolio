@@ -1,36 +1,46 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Dashboard del portafolio
 
-## Getting Started
+Panel privado para administrar perfil, proyectos, habilidades, contactos y credenciales. Usa Next.js 16, Supabase Auth/Storage/Postgres, React Hook Form y Zod.
 
-First, run the development server:
+## Inicio local
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+1. Usa Node.js 22.12 o posterior. Copia `.env.example` a `.env` y configura el proyecto de Supabase.
+2. Instala dependencias con `pnpm install`.
+3. Inicia el servidor con `pnpm dev`.
+4. Comprueba cambios con `pnpm test`, `pnpm lint`, `pnpm exec tsc --noEmit` y `pnpm build`.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+La clave `NEXT_PUBLIC_SUPABASE_KEY` debe ser la clave publicable/anon del proyecto. Nunca uses la `service_role` en esta aplicación: los permisos reales deben estar en RLS.
+No se necesita un UUID fijo en las variables de entorno. Cualquier cuenta válida de Supabase Auth puede iniciar sesión; este proyecto no ofrece un formulario para crear cuentas. Una cuenta nueva ve sus contadores en cero y puede completar su perfil.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Organización
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `app/dashboard`: rutas y componentes visuales. Las páginas leen datos en el servidor; los formularios y botones de acción son componentes cliente.
+- `app/modules`: esquemas de entrada, tipos de lectura, servicios de datos y acciones de servidor por dominio.
+- `app/lib/supabase`: clientes de servidor, renovación de sesión en `proxy.ts` y operaciones de Storage.
+- `app/components`: piezas compartidas de interfaz y proveedores de interacción.
 
-## Learn More
+Los servicios de datos y el cliente de Supabase importan `server-only` para impedir que entren al bundle del navegador. Cada servicio verifica la sesión y filtra por el identificador del usuario autenticado. Los esquemas Zod validan las entradas de cada acción en el servidor.
 
-To learn more about Next.js, take a look at the following resources:
+## Sesiones y caché
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+`proxy.ts` ejecuta la renovación de Supabase para `/` y `/dashboard/*`. Las lecturas de página comprueban el usuario mediante `getUser()`, memorizado solo durante la petición con `cache()` de React. Las acciones verifican la identidad de nuevo dentro del servicio; el layout no es una barrera suficiente para proteger mutaciones.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Las páginas administrativas usan cookies y se renderizan por petición. No se aplica una caché compartida entre usuarios a los datos privados. Tras una mutación, las acciones invalidan el layout de `/dashboard` y sus rutas hijas para actualizar encabezado, listas y resumen. El sitio público del portafolio está fuera de este repositorio: si cachea contenido de Supabase, necesita su propia política de expiración o invalidación.
 
-## Deploy on Vercel
+Avatar, CV e imágenes de proyecto se validan en el navegador y se suben directamente a Supabase Storage con la sesión del usuario. La acción de servidor recibe solo la ruta, verifica que pertenezca al usuario, consulta metadatos en Storage y después guarda la URL. Esto evita el límite de 4.5 MB de los cuerpos de Vercel Functions. Los logos SVG de habilidades siguen otra ruta: se envían a una acción de servidor con límite de 1 MB, se limpian allí con DOMPurify/jsdom y luego se suben a Storage. La validación de MIME y tamaño también debe configurarse en cada bucket de Storage; la validación del navegador no es una barrera de seguridad.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Comprobaciones necesarias en Supabase
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+El esquema y las políticas de la base de datos no están versionados aquí. Antes de usar el panel en producción, verifica en Supabase:
+
+- RLS habilitado en `profiles`, `projects`, `contacts` y `skills`.
+- Políticas `SELECT`, `INSERT` y `UPDATE` de `profiles` limitadas a `id = auth.uid()`; una cuenta nueva debe poder insertar su primera fila. Para `projects`, `contacts` y `skills`, limita `SELECT`, `INSERT`, `UPDATE` y `DELETE` a `user_id = auth.uid()`. Si el sitio público necesita lectura anónima, define políticas `SELECT` específicas sin abrir escrituras.
+- Políticas de Storage para `users` y `projects` limitadas al prefijo del UUID del usuario autenticado. El flujo de estos buckets necesita `INSERT`, `SELECT` (para `info()`) y `DELETE` (para limpiar archivos). Los SVG de habilidades se guardan en `assets/logos/<user_id>/`, así que concede `INSERT` y `DELETE` solo en el prefijo del usuario. Los logos deben poder leerse desde el portafolio público si se usan sus URL públicas. Revisa la visibilidad pública de avatar, CV e imágenes según lo que realmente deba mostrarse.
+- Restricciones de tamaño y MIME en los buckets además de la validación de la aplicación.
+- Confirmación de correo, SMS y reautenticación configuradas y probadas en el proyecto de Supabase.
+
+Los filtros por usuario en el código separan los datos dentro del dashboard; RLS debe imponer la misma separación frente a llamadas directas a Supabase con la clave pública. Comprueba las políticas existentes antes de permitir nuevas cuentas, porque el esquema y las políticas aún no están versionados en este repositorio.
+
+## Alcance actual
+
+Las habilidades permiten crear, editar y eliminar nombre, categoría libre, logo SVG y estado destacado. Un logo subido desde esta vista se elimina de Storage al sustituirlo o borrar su habilidad. La categoría sigue siendo texto libre: un catálogo de categorías o slugs requeriría una migración de datos. El proyecto aún no dispone de esquema SQL y políticas RLS versionados ni de tipos generados desde Supabase, por lo que los modelos de lectura se comprueban en TypeScript pero no contra la base real.

@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, ReactNode } from "react"
 import { ConfirmModal } from "./ConfirModal"
+import { useToast } from "@/app/components/toast/toast.provider"
 
 type ConfirmOptions = {
     title: string
@@ -9,7 +10,7 @@ type ConfirmOptions = {
     confirmText?: string
     cancelText?: string
     variant?: "default" | "danger" | "success" | "warning"
-    action: () => Promise<void> | void
+    action: () => Promise<boolean | void> | boolean | void
 }
 
 type ConfirmContextType = {
@@ -19,6 +20,7 @@ type ConfirmContextType = {
 const ConfirmContext = createContext<ConfirmContextType | null>(null)
 
 export function ConfirmProvider({ children }: { children: ReactNode }) {
+    const { showToast } = useToast()
     const [options, setOptions] = useState<ConfirmOptions | null>(null)
     const [open, setOpen] = useState(false)
     const [loading, setLoading] = useState(false)
@@ -38,8 +40,11 @@ export function ConfirmProvider({ children }: { children: ReactNode }) {
 
         try {
             setLoading(true)
-            await options.action()
-            setOpen(false)
+            const result = await options.action()
+            if (result !== false) setOpen(false)
+        } catch (error) {
+            console.error('Error al confirmar la acción', error)
+            showToast({ type: 'error', message: 'No se pudo completar la acción. Inténtalo de nuevo.' })
         } finally {
             setLoading(false)
         }

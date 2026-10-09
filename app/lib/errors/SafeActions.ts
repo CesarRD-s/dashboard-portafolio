@@ -1,5 +1,5 @@
 import { AppError } from "@/app/lib/errors/AppError"
-import { isRedirectError } from "next/dist/client/components/redirect-error";
+import { unstable_rethrow } from "next/navigation";
 
 export type ActionResponse<T = null> =
     | { success: true; data?: T }
@@ -19,9 +19,7 @@ export function safeAction<TArgs extends unknown[], TReturn>(fn: (...args: TArgs
 
         } catch (error: unknown) {
 
-            if (isRedirectError(error)) {
-                throw error
-            }
+            unstable_rethrow(error)
 
             if (error instanceof AppError) {
                 return {
@@ -33,6 +31,7 @@ export function safeAction<TArgs extends unknown[], TReturn>(fn: (...args: TArgs
                 }
             }
 
+            console.error("Error inesperado en una acción del servidor", error)
             return {
                 success: false,
                 error: {

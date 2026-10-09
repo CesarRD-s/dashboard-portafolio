@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import { CheckCircle, Upload } from "lucide-react";
-import { ChangeEvent, useEffect, useRef } from "react";
+import { ChangeEvent, useEffect, useId, useRef } from "react";
 
 interface InputFileProps {
     id?: string;
@@ -12,9 +12,10 @@ interface InputFileProps {
 }
 
 export const InputFile = (
-    { id = "file", helperText = "Documentos, Imágenes", accept = "*", file, onChange, disabled = false }: InputFileProps
+    { id, helperText = "Documentos, Imágenes", accept = "*", file, onChange, disabled = false }: InputFileProps
 ) => {
     const inputRef = useRef<HTMLInputElement | null>(null);
+    const generatedId = useId();
 
     const handleClick = () => {
         if (disabled) return;
@@ -38,8 +39,10 @@ export const InputFile = (
     return (
         <div className="flex flex-col gap-2">
             {/* DROPZONE */}
-            <div
+            <button
+                type="button"
                 onClick={handleClick}
+                disabled={disabled}
                 className={clsx("group flex flex-col items-center justify-center gap-3 px-4 py-6 rounded-md",
                     "border border-dashed text-center bg-white dark:bg-neutral-800 transition duration",
                     disabled ? "opacity-50 cursor-not-allowed" : "hover:border-blue-500 cursor-pointer",
@@ -73,11 +76,11 @@ export const InputFile = (
                         {isActive ? file.name : helperText}
                     </span>
                 </div>
-            </div>
+            </button>
 
             {/* INPUT */}
             <input
-                id={id}
+                id={id ?? generatedId}
                 ref={inputRef}
                 type="file"
                 accept={accept}

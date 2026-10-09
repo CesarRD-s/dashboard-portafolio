@@ -2,16 +2,14 @@
 
 import { Section } from "@/app/components/layout/Section";
 import { ButtonSubmit } from "@/app/components/shared/forms/ButtonSubmit";
-import { Field } from "@/app/components/shared/forms/Field";
-import { Input } from "@/app/components/shared/forms/Input";
-import { Select } from "@/app/components/shared/forms/Select";
 import { useToast } from "@/app/components/toast/toast.provider";
 import { toFormData } from "@/app/lib/forms/zod";
 import { createContact } from "@/app/modules/contacts/actions/contact.action";
 import { contactSchema, ContactForm } from "@/app/modules/contacts/contact.schema";
-import { categoryContact, typeContact } from "@/app/modules/contacts/contact.model";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import Link from "next/link";
+import { ContactFields } from "@/app/dashboard/contact/ui/components/ContactFields";
 
 export function ContactNewView() {
     const { showToast } = useToast();
@@ -44,82 +42,21 @@ export function ContactNewView() {
         <Section
             id="contact-new"
             title="Nuevo contacto"
-            description="Aquí podrás agregar un nuevo contacto para mostrar en tu portafolio."
+            description="Agrega un medio de contacto a tu portafolio."
+            className="mx-auto max-w-4xl"
         >
             <form
                 onSubmit={handleSubmit(onSubmit)}
-                className="p-6 rounded-md border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900/30 flex flex-col gap-6"
             >
-                <Field label="Título" htmlFor="title" error={errors.title?.message}>
-                    <Input
-                        id="title"
-                        placeholder="Ej: Correo electrónico, LinkedIn, GitHub, etc."
-                        {...register("title")}
-                        error={!!errors.title}
-                    />
-                </Field>
+                <ContactFields register={register} errors={errors} />
 
-                <Field label="Valor" htmlFor="value" error={errors.value?.message}>
-                    <Input
-                        id="value"
-                        placeholder="Ej: email@example.com, +504 1234-5678, Username"
-                        {...register("value")}
-                        error={!!errors.value}
-                    />
-                </Field>
-
-                <Field label="Enlace (opcional)" htmlFor="linkUrl" error={errors.linkUrl?.message}>
-                    <Input
-                        id="linkUrl"
-                        placeholder="Ej: https://www.linkedin.com/in/username"
-                        {...register("linkUrl")}
-                        error={!!errors.linkUrl}
-                    />
-                </Field>
-
-                <Field label="Categoría" htmlFor="category" error={errors.category?.message}>
-                    <Select
-                        id="category"
-                        {...register("category")}
-                        error={!!errors.category}
-                    >
-                        {categoryContact.map((option) => (
-                            <option key={option.value} value={option.value}>
-                                {option.text}
-                            </option>
-                        ))}
-                    </Select>
-                </Field>
-
-                <Field label="Tipo de contacto" htmlFor="type" error={errors.type?.message}>
-                    <Select
-                        id="type"
-                        {...register("type")}
-                        error={!!errors.type}
-                    >
-                        {typeContact.map((option) => (
-                            <option key={option.value} value={option.value}>
-                                {option.text}
-                            </option>
-                        ))}
-                    </Select>
-                </Field>
-
-                <Field label="Es el contacto principal?" htmlFor="isPrimary" error={errors.isPrimary?.message}>
-                    <Select
-                        id="isPrimary"
-                        {...register("isPrimary", { setValueAs: (value) => value === "true" })}
-                    >
-                        <option value="true">Si</option>
-                        <option value="false">No</option>
-                    </Select>
-                </Field>
-
-                <div>
+                <div className="flex flex-col-reverse gap-3 border-t border-neutral-300 pt-6 dark:border-neutral-700 sm:flex-row sm:items-center sm:justify-end">
+                    <Link href="/dashboard/contact" className="inline-flex min-h-10 items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-neutral-600 transition hover:bg-neutral-100 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-white">Cancelar</Link>
                     <ButtonSubmit
                         isValid={isValid}
                         loading={isSubmitting}
-                        text="Guardar contacto" />
+                        text="Guardar contacto"
+                        className="min-h-10 w-full sm:w-auto" />
                 </div>
             </form>
         </Section>

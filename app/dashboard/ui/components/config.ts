@@ -31,8 +31,15 @@ export const actions: Action[] = [
     },
 
     {
-        label: "Editar perfil",
-        description: "Actualizar información personal",
+        label: "Nueva habilidad",
+        description: "Agregar una habilidad al portafolio",
+        href: "/dashboard/skill/new",
+        icon: Wrench,
+    },
+
+    {
+        label: "Perfil",
+        description: "Completar o actualizar información personal",
         href: "/dashboard/profile/edit",
         icon: Pencil,
     },

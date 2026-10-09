@@ -24,4 +24,11 @@ export const profileSchema = z.object({
     cv: cvSchema.optional(),
 });
 
+export const profileUpdateServerSchema = z.object({
+    ...profileFields,
+    avatarPath: z.string().optional(),
+    cvPath: z.string().optional(),
+});
+
 export type ProfileForm = z.infer<typeof profileSchema>;
+export type ProfileUpdateInput = z.infer<typeof profileUpdateServerSchema>;

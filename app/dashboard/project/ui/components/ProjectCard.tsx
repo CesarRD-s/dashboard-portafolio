@@ -1,17 +1,15 @@
-'use client'
-
 import { Project } from "@/app/modules/projects/projects.model"
 import { formatDate } from "date-fns"
-import { Edit, Trash } from "lucide-react"
+import { Edit } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
+import { DeleteProjectButton } from "./DeleteProjectButton"
 
 type Props = {
     project: Project
-    onDelete?: (project: Project) => void
 }
 
-export function ProjectCard({ project, onDelete }: Props) {
+export function ProjectCard({ project }: Props) {
     return (
         <div
             className="p-5 rounded-md border border-neutral-300 dark:border-neutral-700 
@@ -80,13 +78,7 @@ export function ProjectCard({ project, onDelete }: Props) {
                         Editar
                     </Link>
 
-                    <button
-                        onClick={() => onDelete?.(project)}
-                        className="text-sm font-medium text-red-500/80 hover:underline cursor-pointer"
-                    >
-                        <Trash size={14} className="inline-block mr-1" />
-                        Eliminar
-                    </button>
+                    <DeleteProjectButton id={project.id} title={project.title} />
                 </div>
             </div>
         </div>

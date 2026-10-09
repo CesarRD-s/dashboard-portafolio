@@ -28,5 +28,7 @@ export function mapSupabaseError(error: SupabaseError): AppError {
         return new AppError('error', 'Formato de dato inválido o undefined');
     }
 
-    return new AppError('error', `Ocurrio un error: ${error.message}`);
+    // Los mensajes de PostgREST/Auth pueden contener detalles internos.
+    console.error('Error de Supabase', error);
+    return new AppError('error', 'No se pudo completar la operación. Inténtalo de nuevo.');
 }

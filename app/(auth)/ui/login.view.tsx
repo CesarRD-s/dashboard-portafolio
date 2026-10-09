@@ -9,14 +9,12 @@ import { AppError } from "@/app/lib/errors/AppError"
 import { AuthService } from "@/app/modules/auth/auth.service"
 import { loginSchema, LoginDto } from "@/app/modules/auth/auth.schema"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useRouter } from "next/navigation"
 import { useState } from "react"
-import { FaRightToBracket } from "react-icons/fa6"
+import { LogIn } from "lucide-react"
 import { useForm } from "react-hook-form"
 
 export function LoginView() {
     const { showToast } = useToast()
-    const router = useRouter();
 
     const [showPassword, setShowPassword] = useState<boolean>(false)
     const { register, handleSubmit, reset, formState: { errors, isSubmitting, isValid } } = useForm<LoginDto>({
@@ -30,16 +28,14 @@ export function LoginView() {
             await AuthService.login(values)
 
             reset()
-            router.push('/dashboard')
+            window.location.replace('/dashboard')
 
         } catch (error: unknown) {
-            if (error instanceof AppError) {
-                showToast({
-                    type: error.type,
-                    title: 'Error',
-                    message: error.message
-                })
-            }
+            showToast({
+                type: error instanceof AppError ? error.type : 'error',
+                title: 'Error',
+                message: error instanceof AppError ? error.message : 'No se pudo iniciar sesión. Inténtalo de nuevo.',
+            })
         }
     }
 
@@ -55,10 +51,10 @@ export function LoginView() {
                 {/* HEADER */}
                 <div>
                     <h1 className="text-xl font-semibold">
-                        Acceso administrador
+                        Acceso al dashboard
                     </h1>
                     <p className="text-sm text-neutral-500 dark:text-neutral-400">
-                        Verifica tu identidad para continuar
+                        Inicia sesión para continuar
                     </p>
                 </div>
 
@@ -92,8 +88,8 @@ export function LoginView() {
                     <ButtonSubmit
                         isValid={isValid}
                         loading={isSubmitting}
-                        text="Verificar"
-                        icon={<FaRightToBracket />}
+                        text="Iniciar sesión"
+                        icon={<LogIn size={18} />}
                     />
 
                 </form>

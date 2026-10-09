@@ -4,12 +4,13 @@ type Props = {
     id?: string
     title?: string
     description?: string
+    className?: string
     children: ReactNode
 }
 
-export function Section({ id = "", title, description, children }: Props) {
+export function Section({ id = "", title, description, className = "", children }: Props) {
     return (
-        <section id={id} className="space-y-6 scroll-mt-32">
+        <section id={id} className={`space-y-6 scroll-mt-32 ${className}`}>
             {(title || description) && (
                 <div>
                     {title && (
