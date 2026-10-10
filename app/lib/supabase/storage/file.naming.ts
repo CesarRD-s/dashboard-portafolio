@@ -15,5 +15,6 @@ export function generateFileName(
     // nombre original
     const safeName = file.name.split('.').slice(0, -1).join('.').replace(/[^a-zA-Z0-9-_]/g, '_') || 'archivo';
 
-    return `${basePath}/${safeName}-${crypto.randomUUID()}.${ext}`;
+    const filename = `${safeName}-${crypto.randomUUID()}.${ext}`;
+    return basePath ? `${basePath}/${filename}` : filename;
 }

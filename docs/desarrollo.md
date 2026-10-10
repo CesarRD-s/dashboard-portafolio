@@ -1,6 +1,6 @@
 # Guía de desarrollo del dashboard
 
-Panel privado para administrar perfil, proyectos, habilidades, contactos y credenciales. Usa Next.js 16, Supabase Auth/Storage/Postgres, React Hook Form y Zod.
+Panel privado para administrar perfil, proyectos, galería, habilidades, contactos y credenciales. Usa Next.js 16, Supabase Auth/Storage/Postgres, React Hook Form y Zod.
 
 ## Inicio local
 
@@ -37,7 +37,11 @@ El esquema y las políticas de la base de datos no están versionados aquí. Ant
 - Políticas `SELECT`, `INSERT` y `UPDATE` de `profiles` limitadas a `id = auth.uid()`; una cuenta nueva debe poder insertar su primera fila. Para `projects`, `contacts` y `skills`, limita `SELECT`, `INSERT`, `UPDATE` y `DELETE` a `user_id = auth.uid()`. Si el sitio público necesita lectura anónima, define políticas `SELECT` específicas sin abrir escrituras.
 - Políticas de Storage para `users` y `projects` limitadas al prefijo del UUID del usuario autenticado. El flujo de estos buckets necesita `INSERT`, `SELECT` (para `info()`) y `DELETE` (para limpiar archivos). Los logos de habilidades se guardan en `assets/logos/<user_id>/`, así que concede `INSERT` y `DELETE` solo en el prefijo del usuario. El bucket `assets` debe aceptar `image/svg+xml`, `image/png`, `image/webp` e `image/jpeg`, con un límite de al menos 1 MB. Los logos deben poder leerse desde el portafolio público si se usan sus URL públicas. Revisa la visibilidad pública de avatar, CV e imágenes según lo que realmente deba mostrarse.
 - Restricciones de tamaño y MIME en los buckets además de la validación de la aplicación.
-- Confirmación de correo, SMS y reautenticación configuradas y probadas en el proyecto de Supabase.
+- Confirmación de correo y reautenticación para cambio de contraseña configuradas y probadas en el proyecto de Supabase. El teléfono por SMS ya no forma parte de Configuración.
+
+La galería navega `projects/<user_id>/gallery/`, `users/<user_id>/avatars/`, `users/<user_id>/cv/` y las carpetas visibles de `assets`. Los archivos de proyecto y perfil se suben y actualizan desde sus formularios. La galería solo sube JPG y PNG de hasta 5 MB a la raíz o carpeta abierta de `assets`, excepto `logos`, que se gestiona desde Habilidades.
+
+Para navegar se necesita `SELECT` en los tres buckets; para subir directamente a `assets`, `INSERT`; para eliminar archivos, `DELETE`. El servidor impide borrar archivos todavía asignados a proyecto, habilidad o perfil. Un enlace usado solo fuera del dashboard puede dejar de funcionar tras el borrado. Los enlaces públicos requieren buckets públicos; comprueba la visibilidad de `users` antes de compartir un CV. La interfaz no crea ni modifica políticas de Storage.
 
 Los filtros por usuario en el código separan los datos dentro del dashboard; RLS debe imponer la misma separación frente a llamadas directas a Supabase con la clave pública. Comprueba las políticas existentes antes de permitir nuevas cuentas, porque el esquema y las políticas aún no están versionados en este repositorio.
 

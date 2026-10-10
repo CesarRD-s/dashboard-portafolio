@@ -4,6 +4,7 @@ import { formDataToObject } from '../app/lib/forms/zod';
 import { validateFile } from '../app/lib/supabase/storage/file.validator';
 import { toCamelCase, toSnakeCase } from '../app/utils/caseConverter';
 import { isValidUploadPath } from '../app/lib/supabase/storage/file.path';
+import { generateFileName } from '../app/lib/supabase/storage/file.naming';
 import { skillCreateServerSchema } from '../app/modules/skills/skills.schema';
 import { sanitizeSkillLogo } from '../app/modules/skills/skills.svg';
 import { prepareSkillLogo } from '../app/modules/skills/skills.logo';
@@ -111,5 +112,11 @@ describe('límites de datos', () => {
         expect(isValidUploadPath('avatar', owner, `otro/avatars/${filename}`)).toBe(false);
         expect(isValidUploadPath('avatar', owner, `${owner}/avatars/../${filename}`)).toBe(false);
         expect(isValidUploadPath('cv', owner, `${owner}/cv/${filename}`)).toBe(false);
+    });
+
+    it('genera rutas de imagen tanto en la raíz como en una carpeta seleccionada', () => {
+        const file = new File([new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10])], 'Mi banner.png', { type: 'image/png' });
+        expect(generateFileName('', file)).toMatch(/^Mi_banner-[0-9a-f-]+\.png$/);
+        expect(generateFileName('banners/inicio', file)).toMatch(/^banners\/inicio\/Mi_banner-[0-9a-f-]+\.png$/);
     });
 });

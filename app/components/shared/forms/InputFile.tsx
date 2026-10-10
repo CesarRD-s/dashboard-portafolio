@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { CheckCircle, Upload } from "lucide-react";
+import { CheckCircle, Upload, X } from "lucide-react";
 import { ChangeEvent, useEffect, useId, useRef } from "react";
 
 interface InputFileProps {
@@ -37,7 +37,7 @@ export const InputFile = (
     const isActive = !!file;
 
     return (
-        <div className="flex flex-col gap-2">
+        <div className="relative flex flex-col gap-2">
             {/* DROPZONE */}
             <button
                 type="button"
@@ -72,11 +72,27 @@ export const InputFile = (
                             : "Haz clic para subir archivo"}
                     </span>
 
-                    <span className="text-xs text-neutral-500 dark:text-neutral-400">
+                    <span className="max-w-full break-all text-xs text-neutral-500 dark:text-neutral-400">
                         {isActive ? file.name : helperText}
                     </span>
                 </div>
             </button>
+
+            {isActive && (
+                <button
+                    type="button"
+                    onClick={() => {
+                        onChange(null);
+                        if (inputRef.current) inputRef.current.value = "";
+                    }}
+                    disabled={disabled}
+                    aria-label="Quitar archivo seleccionado"
+                    title="Quitar archivo"
+                    className="absolute right-2 top-2 z-10 inline-flex size-9 cursor-pointer items-center justify-center rounded-md border border-neutral-200 bg-white text-neutral-500 transition hover:border-red-300 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:border-red-700 dark:hover:text-red-400"
+                >
+                    <X size={18} />
+                </button>
+            )}
 
             {/* INPUT */}
             <input

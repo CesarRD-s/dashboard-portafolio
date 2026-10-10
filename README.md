@@ -6,9 +6,10 @@ Panel para administrar el contenido de mi portafolio desde un solo lugar.
 
 - Actualizar el perfil y el currículum.
 - Crear, editar y eliminar proyectos, con sus imágenes.
+- Subir imágenes a Assets, explorar los tres buckets y copiar o eliminar archivos que ya no se usan.
 - Organizar habilidades, destacar las principales y añadir logos en SVG, PNG, WebP o JPEG.
 - Administrar los medios de contacto que aparecen en el portafolio.
-- Cambiar los datos de acceso de la cuenta.
+- Cambiar el correo y la contraseña de acceso de la cuenta.
 
 El acceso al panel es privado. El portafolio público se mantiene en otro proyecto.
 

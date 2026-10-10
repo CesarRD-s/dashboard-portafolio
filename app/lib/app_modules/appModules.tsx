@@ -1,4 +1,4 @@
-import { User, Folder, Mail, Wrench, LucideIcon, Settings, HomeIcon } from "lucide-react";
+import { User, Folder, Mail, Wrench, LucideIcon, Settings, HomeIcon, Images } from "lucide-react";
 
 export type AppModule = {
     id: string;
@@ -25,6 +25,12 @@ export const AppModules: AppModule[] = [
         label: "Proyectos",
         icon: Folder,
         basePath: "/dashboard/project",
+    },
+    {
+        id: "media",
+        label: "Galería",
+        icon: Images,
+        basePath: "/dashboard/media",
     },
     {
         id: "contacts",
