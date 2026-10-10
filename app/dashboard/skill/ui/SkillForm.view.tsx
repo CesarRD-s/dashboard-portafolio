@@ -18,7 +18,7 @@ import { Controller, useForm } from 'react-hook-form';
 export function SkillFormView({ skill }: { skill?: Skill }) {
     const { showToast } = useToast();
     const schema = skillFormSchema.superRefine((value, context) => {
-        if (!skill && !value.logo) context.addIssue({ code: 'custom', path: ['logo'], message: 'Selecciona un SVG' });
+        if (!skill && !value.logo) context.addIssue({ code: 'custom', path: ['logo'], message: 'Selecciona un logo' });
     });
     const { register, control, handleSubmit, reset, formState: { errors, isDirty, isValid, isSubmitting } } = useForm<SkillForm>({
         resolver: zodResolver(schema),
@@ -58,7 +58,7 @@ export function SkillFormView({ skill }: { skill?: Skill }) {
             <div className="space-y-6 border-t border-neutral-300 py-8 dark:border-neutral-700">
                 <Field label="Logo" error={errors.logo?.message} hint={skill ? 'El logo actual se conserva si no eliges otro.' : undefined}>
                     <Controller control={control} name="logo" render={({ field }) =>
-                        <InputFile id="skill-logo" file={field.value ?? null} helperText="SVG · Máximo 1 MB" accept=".svg,image/svg+xml" onChange={file => field.onChange(file ?? undefined)} />
+                        <InputFile id="skill-logo" file={field.value ?? null} helperText="SVG, PNG, WebP o JPEG · Máximo 1 MB" accept=".svg,.png,.webp,.jpg,.jpeg,image/svg+xml,image/png,image/webp,image/jpeg" onChange={file => field.onChange(file ?? undefined)} />
                     } />
                 </Field>
                 <label className="flex cursor-pointer items-start gap-3 text-sm text-neutral-800 dark:text-neutral-200">

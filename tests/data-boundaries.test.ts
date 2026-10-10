@@ -6,6 +6,7 @@ import { toCamelCase, toSnakeCase } from '../app/utils/caseConverter';
 import { isValidUploadPath } from '../app/lib/supabase/storage/file.path';
 import { skillCreateServerSchema } from '../app/modules/skills/skills.schema';
 import { sanitizeSkillLogo } from '../app/modules/skills/skills.svg';
+import { prepareSkillLogo } from '../app/modules/skills/skills.logo';
 
 describe('límites de datos', () => {
     it('convierte las claves de filas sin alterar arreglos ni fechas', () => {
@@ -54,6 +55,38 @@ describe('límites de datos', () => {
         const clean = (await sanitizeSkillLogo(logo)).toString('utf8');
         expect(clean).toContain('linearGradient');
         expect(clean).toContain('url(#g)');
+    });
+
+    it('acepta logos PNG, WebP y JPEG con extensión, MIME y firma coherentes', async () => {
+        const png = new File([new Uint8Array([
+            137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13,
+            73, 72, 68, 82, 0, 0, 0, 1, 0, 0, 0, 1,
+        ])], 'logo.png', { type: 'image/png' });
+        const webp = new File([new Uint8Array([
+            82, 73, 70, 70, 8, 0, 0, 0, 87, 69, 66, 80, 86, 80, 56, 88,
+        ])], 'logo.webp', { type: 'image/webp' });
+        const jpeg = new File([new Uint8Array([255, 216, 255, 217])], 'logo.jpeg', { type: 'image/jpeg' });
+
+        for (const [file, extension] of [[png, 'png'], [webp, 'webp'], [jpeg, 'jpg']] as const) {
+            expect(skillCreateServerSchema.safeParse({ title: 'Logo', category: 'Herramientas', isPrimary: 'false', logo: file }).success).toBe(true);
+            const prepared = await prepareSkillLogo(file);
+            expect(prepared.extension).toBe(extension);
+            expect(prepared.contentType).toBe(file.type);
+        }
+    });
+
+    it('rechaza logos cuyo contenido no corresponde al formato declarado', async () => {
+        const fakePng = new File(['<script>alert(1)</script>'], 'logo.png', { type: 'image/png' });
+        const mismatched = new File(['not a webp'], 'logo.png', { type: 'image/webp' });
+        expect(skillCreateServerSchema.safeParse({ title: 'Logo', category: 'Herramientas', isPrimary: 'false', logo: mismatched }).success).toBe(false);
+        await expect(prepareSkillLogo(fakePng)).rejects.toThrow('contenido del logo');
+    });
+
+    it('sigue limpiando los SVG al preparar un logo', async () => {
+        const svg = new File(['<svg xmlns="http://www.w3.org/2000/svg"><script>alert(1)</script><circle r="5"/></svg>'], 'logo.svg', { type: 'image/svg+xml' });
+        const prepared = await prepareSkillLogo(svg);
+        expect(prepared.extension).toBe('svg');
+        expect(prepared.content.toString('utf8')).not.toContain('<script');
     });
 
     it('rechaza archivos cuyo contenido no coincide con el MIME', async () => {

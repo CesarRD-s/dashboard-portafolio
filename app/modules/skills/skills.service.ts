@@ -8,7 +8,7 @@ import { toCamelCase, toSnakeCase } from '@/app/utils/caseConverter';
 import { getServerAuthContext } from '../auth/getServer.context';
 import type { Skill } from './skills.model';
 import type { SkillCreateInput, SkillUpdateInput } from './skills.schema';
-import { sanitizeSkillLogo } from './skills.svg';
+import { prepareSkillLogo } from './skills.logo';
 
 export const SkillsService = {
     getAll: async (): Promise<Skill[]> => {
@@ -84,10 +84,10 @@ async function uploadSkillLogo(
     userId: string,
     file: File,
 ): Promise<string> {
-    const content = await sanitizeSkillLogo(file);
-    const path = `logos/${userId}/${crypto.randomUUID()}.svg`;
+    const { content, contentType, extension } = await prepareSkillLogo(file);
+    const path = `logos/${userId}/${crypto.randomUUID()}.${extension}`;
     const storage = supabase.storage.from('assets');
-    const { error } = await storage.upload(path, content, { contentType: 'image/svg+xml', upsert: false });
+    const { error } = await storage.upload(path, content, { contentType, upsert: false });
     if (error) throw mapSupabaseError(error);
     return storage.getPublicUrl(path).data.publicUrl;
 }

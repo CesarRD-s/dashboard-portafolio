@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { getSkillLogoExtension, MAX_SKILL_LOGO_BYTES } from './skills.logo-config';
 
 const fields = {
     title: z.string().trim().min(1, 'El nombre es obligatorio').max(80, 'El nombre no puede superar 80 caracteres'),
@@ -6,9 +7,9 @@ const fields = {
     isPrimary: z.boolean(),
 };
 
-const logoSchema = z.instanceof(File, { message: 'Selecciona un SVG válido' })
-    .refine(file => file.size > 0 && file.size <= 1024 * 1024, 'El logo no puede superar 1 MB')
-    .refine(file => file.type === 'image/svg+xml' && file.name.toLowerCase().endsWith('.svg'), 'El logo debe ser SVG');
+const logoSchema = z.instanceof(File, { message: 'Selecciona una imagen válida' })
+    .refine(file => file.size > 0 && file.size <= MAX_SKILL_LOGO_BYTES, 'El logo no puede superar 1 MB')
+    .refine(file => getSkillLogoExtension(file) !== null, 'El logo debe ser SVG, PNG, WebP o JPEG');
 
 export const skillFormSchema = z.object({ ...fields, logo: logoSchema.optional() });
 export const skillCreateServerSchema = z.object({

@@ -1,8 +1,7 @@
 import DOMPurify from 'dompurify';
 import { JSDOM } from 'jsdom';
 import { AppError } from '@/app/lib/errors/AppError';
-
-export const MAX_SKILL_LOGO_BYTES = 1024 * 1024;
+import { MAX_SKILL_LOGO_BYTES } from './skills.logo-config';
 
 export async function sanitizeSkillLogo(file: File): Promise<Buffer> {
     if (file.type !== 'image/svg+xml' || !file.name.toLowerCase().endsWith('.svg')) {
