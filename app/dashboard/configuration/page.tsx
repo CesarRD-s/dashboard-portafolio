@@ -7,5 +7,5 @@ export default async function ConfigurationPage() {
 
     if (!user?.email) redirect("/");
 
-    return <ConfigurationView email={user.email} phone={user.phone ?? null} />;
+    return <ConfigurationView email={user.email} />;
 }

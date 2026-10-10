@@ -1,1 +1,1 @@
-export type { ConfirmPhoneDto, RequestPasswordOtpDto, UpdateEmailDto, UpdatePasswordDto, UpdatePhoneDto } from "./account.schema";
+export type { UpdateEmailDto, UpdatePasswordDto } from "./account.schema";

@@ -9,17 +9,18 @@ import { requestEmailChangeAction } from "@/app/modules/auth/actions/account.act
 import { UpdateEmailDto, updateEmailSchema } from "@/app/modules/auth/account.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Mail } from "lucide-react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 
 export function EmailConfigurationForm({ email }: { email: string }) {
     const { showToast } = useToast();
 
-    const form = useForm<UpdateEmailDto>({ resolver: zodResolver(updateEmailSchema), defaultValues: { email }, mode: "onChange" });
+    const form = useForm<UpdateEmailDto>({ resolver: zodResolver(updateEmailSchema), defaultValues: { email: "" }, mode: "onChange" });
+    const desiredEmail = useWatch({ control: form.control, name: "email" });
 
     const onSubmit = async (values: UpdateEmailDto) => {
         const response = await requestEmailChangeAction(toFormData(values));
         if (!response.success) return showToast({ type: response.error.type, message: response.error.message });
-        form.reset(values);
+        form.reset({ email: "" });
         showToast(
             {
                 type: "success",
@@ -45,7 +46,7 @@ export function EmailConfigurationForm({ email }: { email: string }) {
                     label="Nuevo correo electrónico"
                     htmlFor="email"
                     error={form.formState.errors.email?.message}
-                    hint="Confirma el cambio desde los correos que recibas.">
+                    hint="Recibirás un mensaje para confirmar el cambio.">
                     <Input
                         id="email"
                         type="email"
@@ -53,7 +54,7 @@ export function EmailConfigurationForm({ email }: { email: string }) {
                         error={!!form.formState.errors.email} />
                 </Field>
                 <ButtonSubmit
-                    isValid={form.formState.isValid && form.formState.isDirty}
+                    isValid={form.formState.isValid && desiredEmail.trim().toLowerCase() !== email.toLowerCase()}
                     loading={form.formState.isSubmitting}
                     text="Solicitar cambio de correo"
                     icon={<Mail size={18} />} />

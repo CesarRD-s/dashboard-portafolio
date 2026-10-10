@@ -3,7 +3,7 @@ import 'server-only';
 import { AppError } from "@/app/lib/errors/AppError";
 import { mapSupabaseError } from "@/app/lib/errors/ErrorMapper";
 import { getSupabaseServer } from "@/app/lib/supabase/server";
-import { ConfirmPhoneDto, UpdateEmailDto, UpdatePasswordDto, UpdatePhoneDto } from "./account.model";
+import { UpdateEmailDto, UpdatePasswordDto } from "./account.model";
 
 async function getAuthenticatedSupabase() {
     const supabase = await getSupabaseServer();
@@ -31,26 +31,17 @@ export const AccountService = {
         if (error) throw mapSupabaseError(error);
     },
 
-    requestPhoneChange: async ({ phone }: UpdatePhoneDto) => {
-        const supabase = await getAuthenticatedSupabase();
-        const { error } = await supabase.auth.updateUser({ phone });
-        if (error) throw mapSupabaseError(error);
-    },
-
-    confirmPhoneChange: async ({ phone, token }: ConfirmPhoneDto) => {
-        const supabase = await getAuthenticatedSupabase();
-        const { error } = await supabase.auth.verifyOtp({ phone, token, type: "phone_change" });
-        if (error) throw mapSupabaseError(error);
-    },
-
     updatePassword: async ({ currentPassword, password, nonce }: UpdatePasswordDto) => {
         const supabase = await getAuthenticatedSupabase();
         const { error } = await supabase.auth.updateUser({
             password,
-            nonce,
+            ...(nonce ? { nonce } : {}),
             current_password: currentPassword,
         });
 
+        if (error?.code === 'reauthentication_needed') {
+            throw new AppError('info', 'Por seguridad, Supabase requiere un código de verificación. Solicítalo para continuar.');
+        }
         if (error) throw mapSupabaseError(error);
     },
 };
