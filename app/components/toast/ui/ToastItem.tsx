@@ -4,6 +4,25 @@ import { useToast } from "../toast.provider";
 import { Toast } from "../toast.type";
 import clsx from "clsx";
 
+const variantStyles = {
+    success: {
+        border: "border-emerald-400 dark:border-emerald-700",
+        icon: "text-emerald-700 dark:text-emerald-300",
+    },
+    error: {
+        border: "border-red-400 dark:border-red-700",
+        icon: "text-red-700 dark:text-red-300",
+    },
+    info: {
+        border: "border-blue-400 dark:border-blue-700",
+        icon: "text-blue-700 dark:text-blue-300",
+    },
+    warning: {
+        border: "border-amber-400 dark:border-amber-700",
+        icon: "text-amber-800 dark:text-amber-300",
+    },
+};
+
 const icons = {
     success: <CheckCircle size={18} />,
     error: <AlertCircle size={18} />,
@@ -27,8 +46,11 @@ export const ToastItem = ({ toast }: { toast: Toast }) => {
         <div
             onMouseEnter={() => pauseToast(toast.id)}
             onMouseLeave={() => resumeToast(toast.id)}
-            className={clsx("group relative flex items-start gap-3 w-full max-w-sm px-6 py-3 rounded-md border border-neutral-300 dark:border-neutral-700",
-                "bg-white dark:bg-neutral-900 shadow-lg transition duration-300",
+            role={toast.type === "error" || toast.type === "warning" ? "alert" : "status"}
+            aria-live={toast.type === "error" || toast.type === "warning" ? "assertive" : "polite"}
+            className={clsx(
+                "group relative flex w-full max-w-sm items-start gap-3 rounded-md border bg-white px-5 py-4 shadow-lg transition duration-300 dark:bg-neutral-900",
+                variantStyles[toast.type].border,
                 toast.closing
                     ? "opacity-0 translate-y-2 scale-95"
                     : visible
@@ -37,21 +59,22 @@ export const ToastItem = ({ toast }: { toast: Toast }) => {
         >
 
             {/* ICON */}
-            <div
-                className={clsx("mt-0.5",
-                    toast.type === "success" && "text-green-500/75",
-                    toast.type === "error" && "text-red-500/75",
-                    toast.type === "info" && "text-blue-500/75",
-                    toast.type === "warning" && "text-yellow-500/75")}
-            >
+            <div className={clsx("mt-0.5 shrink-0", variantStyles[toast.type].icon)}>
                 {icons[toast.type]}
             </div>
 
             {/* CONTENT */}
-            <div className="flex gap-4">
-
+            <div className="min-w-0 flex-1">
+                {toast.title && (
+                    <p className="text-sm font-semibold text-neutral-950 dark:text-white">
+                        {toast.title}
+                    </p>
+                )}
                 {toast.message && (
-                    <p className="text-sm text-neutral-700 dark:text-neutral-300">
+                    <p className={clsx(
+                        "text-sm leading-5 text-neutral-800 dark:text-neutral-100",
+                        toast.title && "mt-0.5",
+                    )}>
                         {toast.message}
                     </p>
                 )}
@@ -59,7 +82,7 @@ export const ToastItem = ({ toast }: { toast: Toast }) => {
                 {toast.action && (
                     <button
                         onClick={toast.action.onClick}
-                        className="mt-1 text-sm font-medium text-blue-600 hover:underline cursor-pointer"
+                        className="mt-2 cursor-pointer text-sm font-semibold text-blue-800 hover:underline dark:text-blue-200"
                     >
                         {toast.action.label}
                     </button>
@@ -69,8 +92,9 @@ export const ToastItem = ({ toast }: { toast: Toast }) => {
             {/* CLOSE */}
             <button
                 onClick={() => closeToast(toast.id)}
-                className="opacity-0 group-hover:opacity-100 transition-opacity text-neutral-400 hover:text-neutral-600 
-                dark:hover:text-neutral-200 cursor-pointer"
+                type="button"
+                aria-label="Cerrar aviso"
+                className="-mr-1 -mt-1 shrink-0 cursor-pointer rounded p-1 text-neutral-600 transition hover:bg-black/5 hover:text-neutral-950 dark:text-neutral-300 dark:hover:bg-white/10 dark:hover:text-white"
             >
                 <XIcon size={16} />
             </button>
