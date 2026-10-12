@@ -8,8 +8,24 @@ import { generateFileName } from '../app/lib/supabase/storage/file.naming';
 import { skillCreateServerSchema } from '../app/modules/skills/skills.schema';
 import { sanitizeSkillLogo } from '../app/modules/skills/skills.svg';
 import { prepareSkillLogo } from '../app/modules/skills/skills.logo';
+import { projectUpdateServerSchema } from '../app/modules/projects/projects.schema';
 
 describe('límites de datos', () => {
+    it('acepta roles propios y enlaces separados para el portafolio público', () => {
+        const project = {
+            title: 'Proyecto de ejemplo',
+            description: 'Aplicación web de ejemplo',
+            stack: 'Next.js, TypeScript, PostgreSQL',
+            role: 'Responsable técnico',
+            repo: 'https://github.com/example/project',
+            demo: '',
+        };
+
+        expect(projectUpdateServerSchema.safeParse(project).success).toBe(true);
+        expect(projectUpdateServerSchema.safeParse({ ...project, repo: 'enlace inválido' }).success).toBe(false);
+        expect(projectUpdateServerSchema.safeParse({ ...project, demo: 'javascript:alert(1)' }).success).toBe(false);
+    });
+
     it('convierte las claves de filas sin alterar arreglos ni fechas', () => {
         const date = new Date('2026-01-01T00:00:00Z');
         expect(toCamelCase({ user_id: 'u1', metadata: { created_at: date }, stack: ['Next.js'] }))
@@ -39,7 +55,16 @@ describe('límites de datos', () => {
     });
 
     it('limpia código activo de un logo SVG antes de subirlo', async () => {
-        const logo = new File(['<svg xmlns="http://www.w3.org/2000/svg"><script>alert(1)</script><circle cx="10" cy="10" r="5" onload="alert(1)"/></svg>'], 'logo.svg', { type: 'image/svg+xml' });
+        const logo = new File(
+            [
+                '<svg xmlns="http://www.w3.org/2000/svg">',
+                '<script>alert(1)</script>',
+                '<circle cx="10" cy="10" r="5" onload="alert(1)"/>',
+                '</svg>',
+            ],
+            'logo.svg',
+            { type: 'image/svg+xml' },
+        );
         const clean = (await sanitizeSkillLogo(logo)).toString('utf8');
         expect(clean).toContain('<circle');
         expect(clean).not.toContain('<script');
@@ -47,12 +72,25 @@ describe('límites de datos', () => {
     });
 
     it('rechaza referencias externas en SVG', async () => {
-        const logo = new File(['<svg xmlns="http://www.w3.org/2000/svg"><rect fill="url(https://example.com/color)"/></svg>'], 'logo.svg', { type: 'image/svg+xml' });
+        const logo = new File(
+            ['<svg xmlns="http://www.w3.org/2000/svg"><rect fill="url(https://example.com/color)"/></svg>'],
+            'logo.svg',
+            { type: 'image/svg+xml' },
+        );
         await expect(sanitizeSkillLogo(logo)).rejects.toThrow('recursos externos');
     });
 
     it('conserva degradados y referencias internas de un logo', async () => {
-        const logo = new File(['<svg xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="g"><stop stop-color="#fff"/></linearGradient></defs><path d="M0 0h10v10z" fill="url(#g)"/></svg>'], 'logo.svg', { type: 'image/svg+xml' });
+        const logo = new File(
+            [
+                '<svg xmlns="http://www.w3.org/2000/svg">',
+                '<defs><linearGradient id="g"><stop stop-color="#fff"/></linearGradient></defs>',
+                '<path d="M0 0h10v10z" fill="url(#g)"/>',
+                '</svg>',
+            ],
+            'logo.svg',
+            { type: 'image/svg+xml' },
+        );
         const clean = (await sanitizeSkillLogo(logo)).toString('utf8');
         expect(clean).toContain('linearGradient');
         expect(clean).toContain('url(#g)');
@@ -69,7 +107,12 @@ describe('límites de datos', () => {
         const jpeg = new File([new Uint8Array([255, 216, 255, 217])], 'logo.jpeg', { type: 'image/jpeg' });
 
         for (const [file, extension] of [[png, 'png'], [webp, 'webp'], [jpeg, 'jpg']] as const) {
-            expect(skillCreateServerSchema.safeParse({ title: 'Logo', category: 'Herramientas', isPrimary: 'false', logo: file }).success).toBe(true);
+            expect(skillCreateServerSchema.safeParse({
+                title: 'Logo',
+                category: 'Herramientas',
+                isPrimary: 'false',
+                logo: file,
+            }).success).toBe(true);
             const prepared = await prepareSkillLogo(file);
             expect(prepared.extension).toBe(extension);
             expect(prepared.contentType).toBe(file.type);
@@ -79,12 +122,21 @@ describe('límites de datos', () => {
     it('rechaza logos cuyo contenido no corresponde al formato declarado', async () => {
         const fakePng = new File(['<script>alert(1)</script>'], 'logo.png', { type: 'image/png' });
         const mismatched = new File(['not a webp'], 'logo.png', { type: 'image/webp' });
-        expect(skillCreateServerSchema.safeParse({ title: 'Logo', category: 'Herramientas', isPrimary: 'false', logo: mismatched }).success).toBe(false);
+        expect(skillCreateServerSchema.safeParse({
+            title: 'Logo',
+            category: 'Herramientas',
+            isPrimary: 'false',
+            logo: mismatched,
+        }).success).toBe(false);
         await expect(prepareSkillLogo(fakePng)).rejects.toThrow('contenido del logo');
     });
 
     it('sigue limpiando los SVG al preparar un logo', async () => {
-        const svg = new File(['<svg xmlns="http://www.w3.org/2000/svg"><script>alert(1)</script><circle r="5"/></svg>'], 'logo.svg', { type: 'image/svg+xml' });
+        const svg = new File(
+            ['<svg xmlns="http://www.w3.org/2000/svg"><script>alert(1)</script><circle r="5"/></svg>'],
+            'logo.svg',
+            { type: 'image/svg+xml' },
+        );
         const prepared = await prepareSkillLogo(svg);
         expect(prepared.extension).toBe('svg');
         expect(prepared.content.toString('utf8')).not.toContain('<script');

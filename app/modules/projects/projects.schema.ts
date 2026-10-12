@@ -9,10 +9,9 @@ const projectFields = {
     title: z.string().trim().min(1, "El título es obligatorio").max(120, "El título no puede superar 120 caracteres"),
     description: z.string().trim().min(1, "La descripción es obligatoria").max(2000, "La descripción no puede superar 2000 caracteres"),
     stack: z.string().trim().min(1, "Indica al menos una tecnología").max(500, "La lista de tecnologías es demasiado larga"),
-    role: z.enum(["Desarrollador Frontend", "Desarrollador Backend", "Desarrollador Fullstack"], {
-        message: "Selecciona un rol válido",
-    }),
-    link: z.union([z.literal(""), z.url("Introduce una URL válida")]),
+    role: z.string().trim().min(1, "El rol es obligatorio").max(120, "El rol no puede superar 120 caracteres"),
+    repo: z.union([z.literal(""), z.url({ protocol: /^https?$/, error: "Introduce una URL de repositorio válida" })]),
+    demo: z.union([z.literal(""), z.url({ protocol: /^https?$/, error: "Introduce una URL de demo válida" })]),
 };
 
 export const projectCreateSchema = z.object({

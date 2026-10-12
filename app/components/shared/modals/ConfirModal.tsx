@@ -64,7 +64,12 @@ export function ConfirmModal({
                 <h2 id={titleId} className="text-lg font-semibold text-neutral-900 dark:text-white">{title}</h2>
                 {description && <p id={descriptionId} className="text-sm text-neutral-600 dark:text-neutral-400">{description}</p>}
                 <div className="flex justify-end gap-3 pt-4">
-                    <button type="button" onClick={onClose} disabled={loading} className="cursor-pointer rounded-md border border-neutral-200 px-4 py-2 text-sm hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800">
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        disabled={loading}
+                        className="cursor-pointer rounded-md border border-neutral-200 px-4 py-2 text-sm hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
+                    >
                         {cancelText}
                     </button>
                     <button

@@ -70,7 +70,12 @@ export function ProfileEditView({ profile }: Props) {
             reset({ ...values, avatar: undefined, cv: undefined })
         } catch (error) {
             await cleanup();
-            showToast({ type: 'error', message: error instanceof AppError ? error.message : 'No se pudo actualizar el perfil. Inténtalo de nuevo.' });
+            showToast({
+                type: 'error',
+                message: error instanceof AppError
+                    ? error.message
+                    : 'No se pudo actualizar el perfil. Inténtalo de nuevo.',
+            });
         }
     };
 
@@ -111,13 +116,18 @@ export function ProfileEditView({ profile }: Props) {
 
                 <div className="space-y-6 border-t border-neutral-300 py-8 dark:border-neutral-700">
 
-                    <Field label="Biografía corta" htmlFor="profile-bio" error={errors.shortBio?.message} hint="Resume tu experiencia en pocas frases.">
+                    <Field
+                        label="Biografía corta"
+                        htmlFor="profile-bio"
+                        error={errors.shortBio?.message}
+                        hint="Resume tu experiencia en pocas frases."
+                    >
                         <Textarea
                             id="profile-bio"
                             rows={4}
                             {...register("shortBio")}
                             error={!!errors.shortBio}
-                            placeholder="Ej. Desarrollo productos web centrados en las personas..."
+                            placeholder="Ej. Desarrollo software y mantengo aplicaciones web, APIs y bases de datos."
                         />
                     </Field>
 
@@ -126,16 +136,21 @@ export function ProfileEditView({ profile }: Props) {
                             id="profile-profession"
                             {...register("profession")}
                             error={!!errors.profession}
-                            placeholder="Ej. Desarrollador web"
+                            placeholder="Ej. Desarrollador de software"
                         />
                     </Field>
 
-                    <Field label="Frase de presentación" htmlFor="profile-tagline" error={errors.tagLine?.message} hint="Aparece en tu perfil público.">
+                    <Field
+                        label="Frase de presentación"
+                        htmlFor="profile-tagline"
+                        error={errors.tagLine?.message}
+                        hint="Aparece en tu perfil público."
+                    >
                         <Input
                             id="profile-tagline"
                             {...register("tagLine")}
                             error={!!errors.tagLine}
-                            placeholder="Ej. Construyo experiencias web claras y rápidas"
+                            placeholder="Ej. Desarrollo de software · Análisis de sistemas · Soporte de aplicaciones"
                         />
                     </Field>
 
@@ -174,7 +189,10 @@ export function ProfileEditView({ profile }: Props) {
                 </div>
 
                 <div className="flex flex-col-reverse gap-3 border-t border-neutral-300 pt-6 dark:border-neutral-700 sm:flex-row sm:items-center sm:justify-end">
-                    <Link href="/dashboard/profile" className="inline-flex min-h-10 items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-neutral-600 transition hover:bg-neutral-100 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-white">Cancelar</Link>
+                    <Link
+                        href="/dashboard/profile"
+                        className="inline-flex min-h-10 items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-neutral-600 transition hover:bg-neutral-100 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-white"
+                    >Cancelar</Link>
                     <ButtonSubmit
                         isValid={isDirty && isValid}
                         loading={isSubmitting}

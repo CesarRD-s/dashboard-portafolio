@@ -11,7 +11,7 @@ Panel para administrar el contenido de mi portafolio desde un solo lugar.
 - Administrar los medios de contacto que aparecen en el portafolio.
 - Cambiar el correo y la contraseña de acceso de la cuenta.
 
-El acceso al panel es privado. El portafolio público se mantiene en otro proyecto.
+El acceso al panel es privado. El sitio público está en el repositorio [portafolio](https://github.com/CesarRD-s/portafolio) y se visita en [www.creyesdd.com](https://www.creyesdd.com/).
 
 ## Tecnología
 

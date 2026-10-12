@@ -15,10 +15,27 @@ export function ContactFields({ register, errors }: Props) {
         <>
             <div className="space-y-6 border-t border-neutral-300 py-8 dark:border-neutral-700">
                 <Field label="Nombre visible" htmlFor="contact-title" error={errors.title?.message}>
-                    <Input id="contact-title" {...register("title")} error={!!errors.title} placeholder="Ej. Correo electrónico" className="h-11" />
+                    <Input
+                        id="contact-title"
+                        {...register("title")}
+                        error={!!errors.title}
+                        placeholder="Ej. Correo electrónico"
+                        className="h-11"
+                    />
                 </Field>
-                <Field label="Dato de contacto" htmlFor="contact-value" error={errors.value?.message} hint="Este dato será visible en tu portafolio.">
-                    <Input id="contact-value" {...register("value")} error={!!errors.value} placeholder="Ej. hola@ejemplo.com o @usuario" className="h-11" />
+                <Field
+                    label="Dato de contacto"
+                    htmlFor="contact-value"
+                    error={errors.value?.message}
+                    hint="Este dato será visible en tu portafolio."
+                >
+                    <Input
+                        id="contact-value"
+                        {...register("value")}
+                        error={!!errors.value}
+                        placeholder="Ej. hola@ejemplo.com o @usuario"
+                        className="h-11"
+                    />
                 </Field>
             </div>
 
@@ -37,10 +54,21 @@ export function ContactFields({ register, errors }: Props) {
                 </div>
                 <div className="grid gap-6 sm:grid-cols-2">
                     <Field label="Enlace" htmlFor="contact-link" error={errors.linkUrl?.message} hint="Opcional">
-                        <Input id="contact-link" type="url" {...register("linkUrl")} error={!!errors.linkUrl} placeholder="https://..." className="h-11" />
+                        <Input
+                            id="contact-link"
+                            type="url"
+                            {...register("linkUrl")}
+                            error={!!errors.linkUrl}
+                            placeholder="https://..."
+                            className="h-11"
+                        />
                     </Field>
                     <Field label="Contacto principal" htmlFor="contact-primary" error={errors.isPrimary?.message}>
-                        <Select id="contact-primary" {...register("isPrimary", { setValueAs: value => value === "true" })} className="h-11">
+                        <Select
+                            id="contact-primary"
+                            {...register("isPrimary", { setValueAs: value => value === "true" })}
+                            className="h-11"
+                        >
                             <option value="false">No</option>
                             <option value="true">Sí</option>
                         </Select>

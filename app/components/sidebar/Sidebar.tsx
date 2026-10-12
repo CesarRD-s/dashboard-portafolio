@@ -56,7 +56,11 @@ export function Sidebar() {
                             key={module.id}
                             icon={module.icon}
                             label={module.label}
-                            active={pathname === module.basePath || (module.basePath !== '/dashboard' && pathname.startsWith(`${module.basePath}/`))}
+                            active={
+                                pathname === module.basePath ||
+                                (module.basePath !== '/dashboard' &&
+                                    pathname.startsWith(`${module.basePath}/`))
+                            }
                             collapsed={isCollapsed}
                             href={module.basePath}
                             onClick={() => { if (!isDesktop) close() }}
