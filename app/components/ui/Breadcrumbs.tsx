@@ -10,6 +10,7 @@ const routeMap: Record<string, string> = {
     profile: "Perfil",
     edit: "Editar",
     project: "Proyectos",
+    media: "Medios",
     new: "Nuevo",
     contact: "Contactos",
     skill: "Habilidades",
